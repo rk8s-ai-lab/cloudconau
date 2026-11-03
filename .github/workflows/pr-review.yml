@@ -1,7 +1,7 @@
 # pr-review.yml
 # =============
 # cloudconau's copy of rk8s-ai-lab/homelab's pr-review-agents/workflows/pr-review.yml
-# (template at homelab ff7d2d9, from homelab#52; homelab's README, Phase 5). Only this header and the
+# (template at homelab 13651e7, homelab#52; homelab's README, Phase 5). Only this header and the
 # env: block differ from the template; keep the rest in sync with it.
 #
 # Two triggers, two trust tiers:
