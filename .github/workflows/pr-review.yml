@@ -8,7 +8,7 @@
 #   pull_request_target -> pr-review-own runner: posts PR comments as each
 #                          agent's GitHub App. Only for PRs from people with
 #                          a role on the repo (OWNER/MEMBER/COLLABORATOR)
-#                          or by a login in the list in the review job's `if`.
+#                          or by a user ID in the list in the review job's `if`.
 #   workflow_dispatch   -> pr-review-ext runner: reviews a PR in someone
 #                          else's public repo and writes a private write-up.
 #                          No GitHub write token exists on that runner.
@@ -52,14 +52,17 @@ env:
 
 jobs:
   review:
-    # Rob's accounts are listed by login too: a private org membership shows up
-    # in the event as CONTRIBUTOR or NONE, not MEMBER, so repos created in the
-    # org skipped their PRs. The list comes from main, so a PR can't extend it.
+    # Rob's accounts are also accepted by user ID (rkenefeck 12378693, rk8s-collab
+    # 216537092): a private org membership shows up in the event as CONTRIBUTOR
+    # or NONE, not MEMBER, so repos created in the org skipped their PRs. IDs, not
+    # logins: a login can be renamed and then claimed by someone else. With
+    # pull_request_target this file is always read from the base branch, so a PR
+    # can't add its author to the list.
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (!github.event.pull_request.draft &&
        (contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association) ||
-        contains(fromJSON('["rkenefeck","rk8s-collab"]'), github.event.pull_request.user.login)))
+        contains(fromJSON('[12378693,216537092]'), github.event.pull_request.user.id)))
     runs-on: [self-hosted, pr-review, "${{ github.event_name == 'workflow_dispatch' && 'pr-review-ext' || 'pr-review-own' }}"]
     timeout-minutes: 120
     strategy:
